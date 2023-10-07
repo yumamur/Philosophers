@@ -1,6 +1,7 @@
 #include "typeft.h"
+#include "limitsft.h"
 
-static int	atoul_v2(t_c_char *str, t_ulong *ptr)
+int	atoui_v2(t_c_char *str, t_uint *ptr)
 {
 	t_ulong	ret;
 	t_uint	i;
@@ -15,6 +16,8 @@ static int	atoul_v2(t_c_char *str, t_ulong *ptr)
 		i++;
 	}
 	if (str[i] != '\0')
+		return (-1);
+	if (ret > INT_MAX)
 		return (-1);
 	*ptr = ret;
 	return (0);

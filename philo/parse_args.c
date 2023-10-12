@@ -2,7 +2,7 @@
 
 int	atoui_v2(t_c_char *str, t_uint *ptr);
 
-int	parse_args(t_data *data, int argc, t_c_char **argv)
+int	parse_args(t_philo_data *data, int argc, t_c_char **argv)
 {
 	if (argc != 5 && argc != 6)
 		return (-1);

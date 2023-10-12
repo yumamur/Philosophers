@@ -16,10 +16,11 @@ HDR			=	$(DIR_MANDATORY)/philo.h \
 				$(DIR_MANDATORY)/typeft.h
 
 SRC			=	$(DIR_MANDATORY)/atol_v2.c \
+				$(DIR_MANDATORY)/create_data.c \
 				$(DIR_MANDATORY)/main.c \
 				$(DIR_MANDATORY)/parse_args.c
 
-SRC_BONUS	=	$(DIR_BONUS)/main.c
+SRC_BONUS	=	$(DIR_BONUS)/main_bonus.c
 
 OBJ			=	$(patsubst $(DIR_MANDATORY)/%.c, $(DIR_OBJ)/%.o, $(SRC))
 OBJ_BONUS	=	$(patsubst $(DIR_BONUS)/%.c, $(DIR_OBJ)/%.o, $(SRC_BONUS))

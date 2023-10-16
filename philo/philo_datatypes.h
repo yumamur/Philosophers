@@ -25,6 +25,7 @@ typedef struct s_data
 	t_state			*state;
 	pthread_mutex_t	*fork;
 	t_ulong			*last_eat;
+	t_uint			*ct_of_eat;
 	struct timeval	time_start;
 	pthread_mutex_t	death;
 }	t_philo_data;

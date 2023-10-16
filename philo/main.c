@@ -7,8 +7,6 @@ int	main(int argc, char *argv[])
 {
 	t_philo_data	data;
 
-	if (parse_args(&data, argc, argv))
+	if (parse_args(&data, argc, argv) || create_data(&data))
 		return (0);
-	if (create_data(&data))
-		return (-1);
 }

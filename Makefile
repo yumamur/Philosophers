@@ -8,28 +8,31 @@ DIR_OBJ_BONUS	:=	obj_bonus
 DIR_BIN			:=	bin
 
 FILES_HDR	:=	$(DIR_SRC)/philo.h \
-				$(DIR_SRC)/philo_datatypes.h \
+				$(DIR_SRC)/philo_types.h \
 				$(DIR_SRC)/typeft.h
 
-FILES_SRC	:=	$(DIR_SRC)/atoui_v2.c \
-				$(DIR_SRC)/create_data.c \
+FILES_SRC	:=	$(DIR_SRC)/set_the_table.c \
+				$(DIR_SRC)/init_data.c \
+				$(DIR_SRC)/let_the_feast_begin.c \
 				$(DIR_SRC)/main.c \
-				$(DIR_SRC)/parse_args.c
+				$(DIR_SRC)/print_status.c \
+				$(DIR_SRC)/static_locks.c \
+				$(DIR_SRC)/routine.c \
+				$(DIR_SRC)/time_utils.c
 
 FILES_HDR_BONUS	:=	$(DIR_SRC_BONUS)/philo.h \
 					$(DIR_SRC_BONUS)/philo_datatypes.h \
 					$(DIR_SRC_BONUS)/typeft.h
 
 FILES_SRC_BONUS	:=	$(DIR_SRC_BONUS)/atoui_v2.c \
-					$(DIR_SRC_BONUS)/create_data.c \
-					$(DIR_SRC_BONUS)/main.c \
-					$(DIR_SRC_BONUS)/parse_args.c
+					$(DIR_SRC_BONUS)/init_data.c \
+					$(DIR_SRC_BONUS)/main.c
 
 ##########################################################
 
 CC			:=	clang
-CFLAGS		:=	-Wall -Werror -Wextra
-SANITIZER	:=	-fsanitize=thread
+CFLAGS		:=	-Wall -Werror -Wextra -g3
+SANITIZER	:=	-fsanitize=address -fsanitize=leak
 DEFINES		:=
 
 OBJ			:=	$(patsubst $(DIR_SRC)/%.c, $(DIR_OBJ)/%.o, $(FILES_SRC))
@@ -52,9 +55,9 @@ CL Defines -> %s\n"\
 all: TARGET_NAME := $(NAME)
 all: TARGET_OBJ := $(OBJ)
 all: TARGET = all
-all:$(OBJ) $(DIR_BIN)/$(NAME)
+all: $(OBJ) $(DIR_BIN)/$(NAME)
 	@printf "Done building: \033[32;1m%s\033[m\n" "$(TARGET_NAME)"
-	@if [ "$(TARGET)" != "$(MAKECMDGOALS)" ]; then \
+	@if [ "$(MAKECMDGOALS)" != "" ] && [ "$(TARGET)" != "$(MAKECMDGOALS)" ]; then \
 		echo; \
 	fi
 
@@ -68,6 +71,7 @@ bonus: $(OBJ_BONUS) $(DIR_BIN)/$(NAME_BONUS)
 	fi
 
 $(DIR_BIN)/%: $(TARGET_OBJ) | $(DIR_BIN)
+	@rm -rf $@
 	@$(CC) $(CFLAGS) $(SANITIZER) $(DEFINES) $(TARGET_OBJ) -o $@
 
 $(DIR_OBJ)/%.o: $(DIR_SRC)/%.c | $(DIR_OBJ)
@@ -92,7 +96,7 @@ re: fclean all
 CC_T		:=	clang
 CFLAGS_T	:=	-Wall -Werror -Wextra
 SANITIZER_T	:=	-fsanitize=address
-DEFINES_T	:=
+DEFINES_T	:=	-DPHILO_TEST
 
 NAME_TEST		:=	$(NAME)_test
 DIR_OBJ_TEST	:=	obj_test

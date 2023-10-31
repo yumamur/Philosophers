@@ -1,30 +1,45 @@
 #include "philo.h"
+#include "philo_types.h"
 
-int		print_status(t_philo *philo, enum e_state status);
-
-int	enjoy_the_meals(t_philo *philo)
+int	print_status(t_philo *philo, t_time *start, char statusmsg[])
 {
-	pthread_mutex_lock(philo->left_fork);
-	print_status(philo, FORK);
-	pthread_mutex_lock(philo->right_fork);
-	print_status(philo, FORK);
-	philo->last_eat = philo_timer();
-	print_status(philo, EATING);
-	precise_sleep(philo->table, philo->table->time_to_eat);
-	++(philo->ct_of_eat);
-	pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_lock(&philo->table->print);
+	if (!philo->table->death && !philo->table->done)
+		printf("%lu\t%d %s\n", nanotime() - *start, philo->seat, statusmsg);
+	pthread_mutex_unlock(&philo->table->print);
 	return (0);
 }
 
-void	*philo_routine(t_philo *philo)
+static void	eat(t_philo *philo, t_time *start)
 {
-	while (!philo->table->flag_death && !philo->table->flag_done)
+	pthread_mutex_lock(philo->right_fork);
+	print_status(philo, start, FORK);
+	pthread_mutex_lock(philo->left_fork);
+	print_status(philo, start, FORK);
+	pthread_mutex_lock(&philo->table->monitor);
+	++philo->ct_of_eat;
+	print_status(philo, start, EAT);
+	philo->last_eat = nanotime();
+	pthread_mutex_unlock(&philo->table->monitor);
+	p_sleep(&philo->table->death, philo->table->time_to_eat);
+	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_unlock(philo->left_fork);
+}
+
+void	*routine(t_philo *philo)
+{
+	t_table	*table;
+
+	table = philo->table;
+	if (philo->seat % 2 == 0)
+		usleep(1000);
+	while (!table->done && !table->death)
 	{
-		enjoy_the_meals(philo);
-		print_status(philo, SLEEPING);
-		precise_sleep(philo->table, philo->table->time_to_sleep);
-		print_status(philo, THINKING);
+		eat(philo, &table->start);
+		print_status(philo, &table->start, SLEEP);
+		p_sleep(&philo->table->death, philo->table->time_to_sleep);
+		print_status(philo, &table->start, THINK);
+		usleep(500);
 	}
 	return (NULL);
 }

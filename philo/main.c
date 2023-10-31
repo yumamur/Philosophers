@@ -1,29 +1,76 @@
 #include "philo.h"
 
-int	init_table(int argc, char *argv[], t_table *table);
-int	set_the_table(t_table *table);
-int	unset_the_table(t_table *table);
-int	usher_philosophers(t_table *table);
-int	let_the_feast_begin(t_table *table);
+int		set_the_table(int argc, char *argv[], t_table *table);
+int		print_status(t_philo *philo, t_time *start, char statusmsg[]);
+void	*routine(void *param);
+
+void	unset_the_table(t_table *table, pthread_t *list)
+{
+	t_uint	i;
+
+	i = -1;
+	while (++i < table->num_of_philo)
+		pthread_join(list[i], NULL);
+	free(list);
+	i = -1;
+	while (++i < table->num_of_philo)
+		pthread_mutex_destroy(table->forks + i);
+	free(table->philos);
+	pthread_mutex_destroy(&table->print);
+	pthread_mutex_destroy(&table->monitor);
+}
+
+void	monitor(t_table *table)
+{
+	t_uint	i;
+
+	while (!table->done)
+	{
+		i = -1;
+		while (!table->death && ++i < table->num_of_philo)
+		{
+			pthread_mutex_lock(&table->monitor);
+			if (nanotime() - table->philos[i].last_eat > table->time_to_die
+				&& --table->death)
+				printf("%lu\t%d %s\n", nanotime() - table->start, ++i, DEAD);
+			pthread_mutex_unlock(&table->monitor);
+			usleep(100);
+		}
+		if (table->death)
+			return ;
+		i = -1;
+		while (table->min_num_of_eat != -1 && ++i < table->num_of_philo
+			&& table->philos[i].ct_of_eat >= table->min_num_of_eat)
+			;
+		if (i == table->num_of_philo)
+			table->done = -1;
+	}
+}
 
 int	main(int argc, char *argv[])
 {
-	t_table	table;
+	t_table		table;
+	pthread_t	*list;
+	t_uint		i;
 
-	table = (t_table){};
-	if (init_table(argc, argv, &table))
-		return (0);
-	if (set_the_table(&table))
-		return (-1);
-	// for (t_uint i = 0; i < table.num_of_philo; ++i)
-	// {
-	// 	printf("no: %d\n"\
-	// 	 		"\tright:   \t%p\n"\
-	// 	 	 	"\tleft:    \t%p\n",
-	// 		table.philo[i].seat,
-	// 		table.philo[i].right_fork,
-	// 		table.philo[i].left_fork);
-	// }
-	let_the_feast_begin(&table);
-	unset_the_table(&table);
+	if (set_the_table(argc, argv, &table))
+		return (EXIT_FAILURE);
+	list = malloc(table.num_of_philo * sizeof(*list));
+	table.start = nanotime();
+	i = -1;
+	while (++i < table.num_of_philo)
+	{
+		if (pthread_create(list + i, NULL, routine, table.philos + i))
+		{
+			free(list);
+			free(table.philos);
+			return (EXIT_FAILURE);
+		}
+		pthread_mutex_lock(&table.monitor);
+		table.philos[i].last_eat = table.start;
+		pthread_mutex_unlock(&table.monitor);
+	}
+	monitor(&table);
+	unset_the_table(&table, list);
+	return (EXIT_SUCCESS);
 }

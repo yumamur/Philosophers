@@ -1,25 +1,25 @@
-#include "philo_time.h"
-#include <time.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include "philo_types.h"
 
-t_time_nanosec	philo_timer(void)
+t_time	nanotime(void)
 {
 	struct timeval	time;
 
-	gettimeofday(&time, NULL);
-	return (time.tv_sec * 1000000L + time.tv_usec);
+	if (gettimeofday(&time, NULL))
+		return (-1);
+	return (time.tv_sec * 1000L + time.tv_usec / 1000L);
 }
 
-void	precise_sleep(t_table *table, t_uint nanoseconds)
+void	p_sleep(t_flag *death, t_time length)
 {
-	t_time_nanosec	cur;
+	_Atomic t_time	cur;
 
-	cur = philo_timer();
-	while (!table->flag_death)
+	cur = nanotime();
+	while (!*death)
 	{
-		if (philo_timer() - cur >= nanoseconds)
-		{
-			break ;
-		}
+		if (nanotime() - cur >= length)
+			return ;
 		usleep(1000);
 	}
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yumamur <yumamur@student.42istanbul.com.t  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/31 19:34:40 by yumamur           #+#    #+#             */
+/*   Updated: 2023/10/31 19:34:40 by yumamur          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int		set_the_table(int argc, char *argv[], t_table *table);
@@ -66,9 +78,7 @@ int	main(int argc, char *argv[])
 			free(table.philos);
 			return (EXIT_FAILURE);
 		}
-		pthread_mutex_lock(&table.monitor);
 		table.philos[i].last_eat = table.start;
-		pthread_mutex_unlock(&table.monitor);
 	}
 	monitor(&table);
 	unset_the_table(&table, list);

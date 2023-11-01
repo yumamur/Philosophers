@@ -1,50 +1,47 @@
 #ifndef PHILO_TYPES_H
 # define PHILO_TYPES_H
 
-# include <pthread.h>
+# include <semaphore.h>
+# include <signal.h>
 # include "typeft.h"
 
-enum e_opr
+# define FORK "has taken a fork"
+# define EAT "is eating"
+# define SLEEP "is sleeping"
+# define THINK "is thinking"
+# define DEAD "is dead"
+
+
+typedef _Atomic(int)		t_flag;
+typedef _Atomic(long)		t_time;
+
+typedef struct s_philo		t_philo;
+typedef struct s_table		t_table;
+typedef enum e_philo_status	t_philo_status;
+
+
+struct s_philo
 {
-	START,
-	CURR
+	t_uint			seat;
+	t_table			*table;
+	t_time			last_eat;
+	_Atomic(int)	ct_of_eat;
 };
 
-typedef unsigned long int	t_time_nanosec;
-
-enum e_state
+struct s_table
 {
-	FORK,
-	EATING,
-	THINKING,
-	SLEEPING,
-	DEAD
+	t_uint	num_of_philo;
+	t_uint	time_to_die;
+	t_uint	time_to_eat;
+	t_uint	time_to_sleep;
+	int		min_num_of_eat;
+	t_philo	*philos;
+	sem_t	*forks;
+	sem_t	*monitor;
+	sem_t	*print;
+	t_flag	death;
+	t_flag	done;
+	t_time	start;
 };
 
-typedef struct s_philo
-{
-	t_uint					seat;
-	pthread_mutex_t			*left_fork;
-	pthread_mutex_t			*right_fork;
-	struct s_table			*table;
-	_Atomic(t_time_nanosec)	last_eat;
-	int						ct_of_eat;
-}	t_philo;
-
-typedef struct s_table
-{
-	t_uint					num_of_philo;
-	t_ulong					time_to_die;
-	t_ulong					time_to_eat;
-	t_ulong					time_to_sleep;
-	int						min_ct_of_eat;
-	_Atomic(int)			flag_death;
-	_Atomic(int)			flag_done;
-	pthread_mutex_t			monitor;
-	pthread_mutex_t			print;
-	t_philo					*philo;
-	pthread_mutex_t			*fork;
-	_Atomic(t_time_nanosec)	start;
-	_Atomic(t_time_nanosec (*)(enum e_opr))	timer;
-}	t_table;
 #endif

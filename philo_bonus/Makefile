@@ -1,9 +1,9 @@
 CC = clang
 CFLAGS = -Wall -Werror -Wextra
 CDEFINES =
-# SANITIZER = -fsanitize=thread
+SANITIZER = -fsanitize=address
 
-NAME = philo
+NAME = philo_bonus
 
 SRC = main.c \
 	  routine.c \
@@ -11,6 +11,7 @@ SRC = main.c \
 	  time_utils.c
 
 all: $(NAME)
+
 
 $(NAME): $(SRC)
 	@$(CC) $(CFLAGS) $(CDEFINES) $(SANITIZER) $(SRC) -o $(NAME)

@@ -1,46 +1,44 @@
 #include "philo.h"
+#include "philo_types.h"
 
-int		print_status(t_philo *philo, enum e_state status);
-
-int	enjoy_the_meals(t_philo *philo)
+int	print_status(t_philo *philo, t_time *start, char statusmsg[])
 {
-	if (pthread_mutex_lock(philo->left_fork))
-		return (put_error(PERR_MLOCK));
-	if (print_status(philo, FORK))
-		return (-1);
-	if (pthread_mutex_lock(philo->right_fork))
-		return (put_error(PERR_MLOCK));
-	if (print_status(philo, FORK))
-		return (-1);
-	if (pthread_mutex_lock(&philo->table->monitor))
-		return (put_error(PERR_MLOCK));
-	++philo->ct_of_eat;
-	if (print_status(philo, EATING))
-		return (-1);
-	philo->last_eat = philo_timer(CURR);
-	if (pthread_mutex_unlock(&philo->table->monitor))
-		return (put_error(PERR_MUNLOCK));
-	if (precise_sleep(philo->table->time_to_eat))
-		return (put_error(PERR_TIMER));
-	if (pthread_mutex_unlock(philo->left_fork))
-		return (put_error(PERR_MUNLOCK));
-	if (pthread_mutex_unlock(philo->right_fork))
-		return (put_error(PERR_MUNLOCK));
+	if (philo->table->death || philo->table->done)
+		exit(0);
+	sem_wait(philo->table->print);
+	printf("%lu\t%d %s\n", nanotime() - *start, philo->seat, statusmsg);
+	sem_post(philo->table->print);
 	return (0);
 }
 
-void	*philo_routine(t_philo *philo)
+static void	eat(t_philo *philo, t_time *start)
 {
-	while (!philo->table->flag_death && !philo->table->flag_done)
+	sem_wait(philo->table->forks);
+	print_status(philo, start, FORK);
+	sem_wait(philo->table->forks);
+	print_status(philo, start, FORK);
+	sem_wait(philo->table->monitor);
+	++philo->ct_of_eat;
+	print_status(philo, start, EAT);
+	philo->last_eat = nanotime();
+	sem_post(philo->table->monitor);
+	p_sleep(&philo->table->death, philo->table->time_to_eat);
+	sem_post(philo->table->forks);
+	sem_post(philo->table->forks);
+}
+
+void	*routine(t_philo *philo)
+{
+	t_table	*table;
+
+	table = philo->table;
+	while (!table->done && !table->death)
 	{
-		if (enjoy_the_meals(philo))
-			return (NULL);
-		if (print_status(philo, SLEEPING))
-			return (NULL);
-		precise_sleep(philo->table->time_to_sleep);
-		if (print_status(philo, THINKING))
-			return (NULL);
-		precise_sleep(500);
+		eat(philo, &table->start);
+		print_status(philo, &table->start, SLEEP);
+		p_sleep(&philo->table->death, philo->table->time_to_sleep);
+		print_status(philo, &table->start, THINK);
+		usleep(500);
 	}
-	return (NULL);
+	exit(0);
 }

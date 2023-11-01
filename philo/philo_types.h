@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_types.h                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yumamur <yumamur@student.42istanbul.com.t  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/31 19:37:10 by yumamur           #+#    #+#             */
+/*   Updated: 2023/10/31 19:37:10 by yumamur          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_TYPES_H
 # define PHILO_TYPES_H
 
@@ -10,7 +22,6 @@
 # define THINK "is thinking"
 # define DEAD "is dead"
 
-
 typedef _Atomic(int)		t_flag;
 typedef _Atomic(long)		t_time;
 typedef pthread_mutex_t		t_mutex;
@@ -18,7 +29,6 @@ typedef pthread_mutex_t		t_mutex;
 typedef struct s_philo		t_philo;
 typedef struct s_table		t_table;
 typedef enum e_philo_status	t_philo_status;
-
 
 struct s_philo
 {

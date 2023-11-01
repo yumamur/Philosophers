@@ -1,50 +1,78 @@
-#include "philo.h"
-#include "typeft.h"
+#include <limits.h>
 #include <string.h>
+#include <pthread.h>
+#include <fcntl.h>
+#include "philo_types.h"
 
-int	unset_the_table(t_table *table)
+static int	atoui_v2(t_c_char *str, t_uint *ptr)
 {
+	t_ulong	ret;
 	t_uint	i;
 
-	if (pthread_mutex_destroy(&table->monitor)
-		|| pthread_mutex_destroy(&table->print))
+	if (!str || !*str)
 		return (-1);
 	i = 0;
-	while (i < table->num_of_philo)
+	ret = 0;
+	while (str[i] >= '0' && str[i] <= '9' && i < 10)
 	{
-		if (pthread_mutex_destroy(&table->fork[i++]))
-			return (-1);
+		ret = (str[i] - 48) + (ret * 10);
+		i++;
 	}
-	memset(table->philo, 0, table->num_of_philo * sizeof(*table->philo));
-	free(table->philo);
-	memset(table->fork, 0, table->num_of_philo * sizeof(*table->fork));
-	free(table->fork);
+	if (str[i] != '\0')
+		return (-1);
+	if (ret > INT_MAX)
+		return (-1);
+	*ptr = ret;
 	return (0);
 }
 
-int	set_the_table(t_table *table)
+static int	parse_args(int argc, char **argv, t_table *table)
+{
+	int	err;
+
+	err = 0;
+	err += atoui_v2(argv[2], &table->num_of_philo);
+	table->time_to_die = (t_ulong)table->num_of_philo;
+	err += atoui_v2(argv[3], &table->num_of_philo);
+	table->time_to_eat = (t_ulong)table->num_of_philo;
+	err += atoui_v2(argv[4], &table->num_of_philo);
+	table->time_to_sleep = (t_ulong)table->num_of_philo;
+	if (argc == 6)
+	{
+		err += atoui_v2(argv[5], &table->num_of_philo);
+		table->min_num_of_eat = table->num_of_philo;
+	}
+	else
+		table->min_num_of_eat = -1;
+	err += atoui_v2(argv[1], &table->num_of_philo);
+	if (err)
+		return (-1);
+	return (0);
+}
+
+int	set_the_table(int argc, char *argv[], t_table *table)
 {
 	t_uint	i;
 
-	if (pthread_mutex_init(&table->monitor, NULL)
-		|| pthread_mutex_init(&table->print, NULL))
+	*table = (t_table){};
+	if (parse_args(argc, argv, table))
 		return (-1);
+	table->philos = malloc(table->num_of_philo * sizeof(*table->philos));
+	memset(table->philos, 0, table->num_of_philo * sizeof(*table->philos));
+	if (!table->philos)
+		return (-1);
+	sem_unlink("/monitor_semaphore");
+	sem_unlink("/print_semaphore");
+	sem_unlink("/forks_semaphore");
+	table->monitor = sem_open("/monitor_semaphore", O_CREAT, 0644, 1);
+	table->print = sem_open("/print_semaphore", O_CREAT, 0644, 1);
+	table->forks = sem_open("/forks_semaphore", O_CREAT, 0644, table->num_of_philo);
 	i = 0;
 	while (i < table->num_of_philo)
 	{
-		if (pthread_mutex_init(&table->fork[i], NULL))
-			return (-1);
-		table->philo[i] = (t_philo){};
-		table->philo[i].seat = i + 1;
-		table->philo[i].table = table;
-		if (i < table->num_of_philo - 1)
-			table->philo[i].right_fork = &table->fork[i];
-		else
-			table->philo[i].right_fork = &table->fork[table->num_of_philo - 1];
-		if (i < table->num_of_philo - 1)
-			table->philo[i].left_fork = &table->fork[i + 1];
-		else
-			table->philo[i].left_fork = &table->fork[0];
+		table->philos[i] = (t_philo){};
+		table->philos[i].seat = i + 1;
+		table->philos[i].table = table;
 		++i;
 	}
 	return (0);

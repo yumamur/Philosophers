@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   typeft.h                                           :+:      :+:    :+:   */
+/*   typeft_bonus.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yumamur <yumamur@student.42istanbul.com.t  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/23 14:44:12 by yumamur           #+#    #+#             */
-/*   Updated: 2023/08/26 14:06:31 by yumamur          ###   ########.fr       */
+/*   Created: 2023/11/01 13:18:43 by yumamur           #+#    #+#             */
+/*   Updated: 2023/11/01 13:18:43 by yumamur          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TYPEFT_H
-# define TYPEFT_H
+#ifndef TYPEFT_BONUS_H
+# define TYPEFT_BONUS_H
 
 # include <stdlib.h>
 

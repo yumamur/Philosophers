@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   set_the_table_bonus.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yumamur <yumamur@student.42istanbul.com.t  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/11/01 13:17:48 by yumamur           #+#    #+#             */
+/*   Updated: 2023/11/01 13:17:48 by yumamur          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <limits.h>
 #include <string.h>
 #include <pthread.h>
 #include <fcntl.h>
-#include "philo_types.h"
+#include "philo_types_bonus.h"
 
 static int	atoui_v2(t_c_char *str, t_uint *ptr)
 {
@@ -66,7 +78,8 @@ int	set_the_table(int argc, char *argv[], t_table *table)
 	sem_unlink("/forks_semaphore");
 	table->monitor = sem_open("/monitor_semaphore", O_CREAT, 0644, 1);
 	table->print = sem_open("/print_semaphore", O_CREAT, 0644, 1);
-	table->forks = sem_open("/forks_semaphore", O_CREAT, 0644, table->num_of_philo);
+	table->forks
+		= sem_open("/forks_semaphore", O_CREAT, 0644, table->num_of_philo);
 	i = 0;
 	while (i < table->num_of_philo)
 	{

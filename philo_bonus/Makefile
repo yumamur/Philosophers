@@ -5,10 +5,10 @@ SANITIZER = -fsanitize=address
 
 NAME = philo_bonus
 
-SRC = main.c \
-	  routine.c \
-	  set_the_table.c \
-	  time_utils.c
+SRC = main_bonus.c \
+	  routine_bonus.c \
+	  set_the_table_bonus.c \
+	  time_utils_bonus.c
 
 all: $(NAME)
 

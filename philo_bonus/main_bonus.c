@@ -1,8 +1,18 @@
-#include "philo.h"
-#include "typeft.h"
-#include <sched.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yumamur <yumamur@student.42istanbul.com.t  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/11/01 13:15:49 by yumamur           #+#    #+#             */
+/*   Updated: 2023/11/01 13:15:49 by yumamur          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <sys/wait.h>
 #include <signal.h>
+#include "philo_bonus.h"
 
 int		set_the_table(int argc, char *argv[], t_table *table);
 int		print_status(t_philo *philo, t_time *start, char statusmsg[]);

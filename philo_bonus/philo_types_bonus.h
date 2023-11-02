@@ -13,6 +13,7 @@
 #ifndef PHILO_TYPES_BONUS_H
 # define PHILO_TYPES_BONUS_H
 
+# include <pthread.h>
 # include <semaphore.h>
 # include <signal.h>
 # include "typeft_bonus.h"
@@ -21,7 +22,6 @@
 # define EAT "is eating"
 # define SLEEP "is sleeping"
 # define THINK "is thinking"
-# define DEAD "is dead"
 
 typedef _Atomic(int)		t_flag;
 typedef _Atomic(long)		t_time;
@@ -31,6 +31,7 @@ typedef struct s_table		t_table;
 
 struct s_philo
 {
+	pthread_t		monitor;
 	t_uint			seat;
 	t_table			*table;
 	t_time			last_eat;

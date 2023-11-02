@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -Wall -Werror -Wextra
 CDEFINES =
-SANITIZER = -fsanitize=address
+# SANITIZER = -fsanitize=address
 
 NAME = philo_bonus
 

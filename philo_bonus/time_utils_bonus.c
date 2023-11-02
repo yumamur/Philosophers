@@ -23,7 +23,7 @@ t_time	nanotime(void)
 	return (time.tv_sec * 1000L + time.tv_usec / 1000L);
 }
 
-void	p_sleep(t_flag *death, t_time length)
+int	p_sleep(t_flag *death, t_time length)
 {
 	_Atomic t_time	cur;
 
@@ -31,7 +31,8 @@ void	p_sleep(t_flag *death, t_time length)
 	while (!*death)
 	{
 		if (nanotime() - cur >= length)
-			return ;
+			return (0);
 		usleep(100);
 	}
+	return (-1);
 }

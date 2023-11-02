@@ -73,13 +73,13 @@ int	set_the_table(int argc, char *argv[], t_table *table)
 	memset(table->philos, 0, table->num_of_philo * sizeof(*table->philos));
 	if (!table->philos)
 		return (-1);
-	sem_unlink("/monitor_semaphore");
-	sem_unlink("/print_semaphore");
-	sem_unlink("/forks_semaphore");
-	table->monitor = sem_open("/monitor_semaphore", O_CREAT, 0644, 1);
-	table->print = sem_open("/print_semaphore", O_CREAT, 0644, 1);
+	sem_unlink("monitor_semaphore");
+	sem_unlink("print_semaphore");
+	sem_unlink("forks_semaphore");
+	table->monitor = sem_open("monitor_semaphore", O_CREAT, 0644, 1);
+	table->print = sem_open("print_semaphore", O_CREAT, 0644, 1);
 	table->forks
-		= sem_open("/forks_semaphore", O_CREAT, 0644, table->num_of_philo);
+		= sem_open("forks_semaphore", O_CREAT, 0644, table->num_of_philo);
 	i = 0;
 	while (i < table->num_of_philo)
 	{

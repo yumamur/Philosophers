@@ -16,7 +16,7 @@
 
 int		set_the_table(int argc, char *argv[], t_table *table);
 int		print_status(t_philo *philo, t_time *start, char statusmsg[]);
-void	*routine(void *param);
+void	routine(t_philo *philo);
 
 void	unset_the_table(t_table *table, pid_t *list)
 {
@@ -38,37 +38,10 @@ void	unset_the_table(t_table *table, pid_t *list)
 	sem_close(table->monitor);
 	sem_close(table->print);
 	sem_close(table->forks);
-	sem_unlink("/monitor_semaphore");
-	sem_unlink("/print_semaphore");
-	sem_unlink("/forks_semaphore");
+	sem_unlink("monitor_semaphore");
+	sem_unlink("print_semaphore");
+	sem_unlink("forks_semaphore");
 	free(table->philos);
-}
-
-void	monitor(t_table *table)
-{
-	t_uint	i;
-
-	while (!table->done)
-	{
-		i = -1;
-		while (!table->death && ++i < table->num_of_philo)
-		{
-			sem_wait(table->monitor);
-			if (nanotime() - table->philos[i].last_eat > table->time_to_die
-				&& --table->death)
-				printf("%lu\t%d %s\n", nanotime() - table->start, ++i, DEAD);
-			sem_post(table->monitor);
-			usleep(100);
-		}
-		if (table->death)
-			return ;
-		i = -1;
-		while (table->min_num_of_eat != -1 && ++i < table->num_of_philo
-			&& table->philos[i].ct_of_eat >= table->min_num_of_eat)
-			;
-		if (i == table->num_of_philo)
-			table->done = -1;
-	}
 }
 
 int	main(int argc, char *argv[])
@@ -87,13 +60,9 @@ int	main(int argc, char *argv[])
 		list[i] = fork();
 		if (list[i] == -1)
 			exit(1);
-		if (list[i])
-		{
-			table.philos[i].last_eat = table.start;
+		if (!list[i])
 			routine(table.philos + i);
-		}
 	}
-	monitor(&table);
 	unset_the_table(&table, list);
 	return (EXIT_SUCCESS);
 }
